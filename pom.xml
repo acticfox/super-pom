@@ -106,18 +106,18 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<distributionManagement>
-        <repository>
-            <id>ZCB Releases</id>
-            <name>maven-releases</name>
-            <url>http://mvn.zhichubao.com/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>ZCB Snapshots</id>
-            <name>maven-snapshots</name>
-            <url>http://mvn.zhichubao.com/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 </project>
