@@ -7,11 +7,27 @@
 	<artifactId>super-pom</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
 	<name>super-pom-ce</name>
 	<url>http://maven.apache.org</url>
 
+	<licenses>
+		<license>
+			<name>AGPL-3.0-or-later</name>
+			<url>https://spdx.org/licenses/AGPL-3.0-or-later.html</url>
+		</license>
+	</licenses>
 	
+	<developers>
+		<developer>
+			<name>kfy</name>
+			<email>kfy0521@163.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+	</developers>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -20,7 +36,7 @@
 		<spring.boot.version>2.4.13</spring.boot.version>
 		<acticfox-version>1.0.0-SNAPSHOT</acticfox-version>
 		<jakarta.validation-api.version>3.0.1</jakarta.validation-api.version>
-        <hibernate-validator.version>7.0.1.Final</hibernate-validator.version>
+		<hibernate-validator.version>7.0.1.Final</hibernate-validator.version>
 		<maven-enforcer-plugin_version>1.1</maven-enforcer-plugin_version>
 		<extra-enforcer-rules_version>1.0-alpha-5</extra-enforcer-rules_version>
 	</properties>
@@ -28,17 +44,17 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- javax 验证包 -->
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-                <version>${jakarta.validation-api.version}</version>
-            </dependency>
-            <!-- javax 扩展验证包 -->
-            <dependency>
-                <groupId>org.hibernate.validator</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate-validator.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>jakarta.validation</groupId>
+				<artifactId>jakarta.validation-api</artifactId>
+				<version>${jakarta.validation-api.version}</version>
+			</dependency>
+			<!-- javax 扩展验证包 -->
+			<dependency>
+				<groupId>org.hibernate.validator</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>${hibernate-validator.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
@@ -210,7 +226,7 @@
 								<ignoreClass>javax.xml.namespace.*</ignoreClass>
 								<ignoreClass>org.apache.axis2.*</ignoreClass>
 							</ignoreClasses>
-							<message>[ERROR] [Alibaba Enforcer Rules] find DuplicateClasses</message>
+							<message>[ERROR] [Acticfox Enforcer Rules] find DuplicateClasses</message>
 						</banDuplicateClasses>
 					</rules>
 				</configuration>
@@ -233,17 +249,95 @@
 		</plugins>
 	</build>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<version>2.8.2</version>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.0</version>
+						<configuration>
+							<source>${maven.compiler.source}</source>
+							<target>${maven.compiler.target}</target>
+							<fork>true</fork>
+							<verbose>true</verbose>
+							<encoding>UTF-8</encoding>
+							<showWarnings>false</showWarnings>
+						</configuration>
+					</plugin>
+					<!-- Source -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Javadoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<configuration>
+							<show>private</show>
+							<nohelp>true</nohelp>
+							<charset>UTF-8</charset>
+							<encoding>UTF-8</encoding>
+							<docencoding>UTF-8</docencoding>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- GPG 验签 -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+
+			<distributionManagement>
+				<snapshotRepository>
+					<id>acticfox</id>
+					<name>Sonatype Nexus Snapshots</name>
+					<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+				</snapshotRepository>
+				<repository>
+					<id>acticfox</id>
+					<name>Nexus Release Repository</name>
+					<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 
 </project>
